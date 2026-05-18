@@ -1,0 +1,83 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Desktop (Debug)",
+      "type": "shell",
+      "command": "./gradlew desktop:debug",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": "$javac"
+    },
+    {
+      "label": "Build Android Debug APK",
+      "type": "shell",
+      "command": "./gradlew android:assembleDebug",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": "$javac"
+    },
+    {
+      "label": "Build Android Release APK",
+      "type": "shell",
+      "command": "./gradlew android:assembleRelease",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": "$javac"
+    },
+    {
+      "label": "Build Desktop Release JAR",
+      "type": "shell",
+      "command": "./gradlew desktop:release",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": "$javac"
+    },
+    {
+      "label": "Package Desktop Native Image",
+      "type": "shell",
+      "command": "./gradlew desktop:jpackageImage",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": "$javac"
+    },
+    {
+      "label": "Clean All",
+      "type": "shell",
+      "command": "./gradlew clean",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Copy Android Natives",
+      "type": "shell",
+      "command": "./gradlew android:copyAndroidNatives",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

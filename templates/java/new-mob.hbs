@@ -1,0 +1,52 @@
+package com.shatteredpixel.shatteredpixeldungeon.actors.mobs;
+
+import com.shatteredpixel.shatteredpixeldungeon.sprites.{{Name}}Sprite;
+import com.watabou.utils.Bundle;
+
+public class {{Name}} extends Mob {
+
+    {
+        spriteClass = {{Name}}Sprite.class;
+
+        HP = HT = {{hp}};
+        defenseSkill = {{defenseSkill}};
+
+        EXP = 5; // TODO: set appropriate XP
+        maxLvl = 10; // TODO: set max depth for spawning
+    }
+
+    @Override
+    public int damageRoll() {
+        return Random.NormalIntRange(1, 8); // TODO: adjust damage range
+    }
+
+    @Override
+    public int attackSkill(Char target) {
+        return 10; // TODO: set attack skill
+    }
+
+    @Override
+    public int drRoll() {
+        return super.drRoll() + Random.NormalIntRange(0, 2); // TODO: adjust armor
+    }
+
+    // Optional: override act() for custom AI
+    // @Override
+    // protected boolean act() {
+    //     return super.act();
+    // }
+
+    private static final String MY_FIELD = "my_field";
+
+    @Override
+    public void storeInBundle(Bundle bundle) {
+        super.storeInBundle(bundle);
+        // bundle.put(MY_FIELD, myField);
+    }
+
+    @Override
+    public void restoreFromBundle(Bundle bundle) {
+        super.restoreFromBundle(bundle);
+        // myField = bundle.getInt(MY_FIELD);
+    }
+}

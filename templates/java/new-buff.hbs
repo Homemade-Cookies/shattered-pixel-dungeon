@@ -1,0 +1,61 @@
+package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
+
+import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
+import com.watabou.utils.Bundle;
+
+public class {{Name}} extends Buff {
+
+    // Duration in turns (remove if permanent)
+    private float left;
+
+    {
+        type = buffType.POSITIVE; // POSITIVE, NEGATIVE, or NEUTRAL
+    }
+
+    public static {{Name}} affect(Char target, float duration) {
+        {{Name}} buff = Buff.affect(target, {{Name}}.class);
+        buff.left = duration;
+        return buff;
+    }
+
+    @Override
+    public boolean act() {
+        left -= TICK;
+        if (left <= 0) {
+            detach();
+        } else {
+            spend(TICK);
+        }
+        return true;
+    }
+
+    @Override
+    public int icon() {
+        return BuffIndicator.NONE; // TODO: set indicator icon
+    }
+
+    @Override
+    public String toString() {
+        return Messages.get(this, "name");
+    }
+
+    @Override
+    public String desc() {
+        return Messages.get(this, "desc", dispTurns(left));
+    }
+
+    private static final String LEFT = "left";
+
+    @Override
+    public void storeInBundle(Bundle bundle) {
+        super.storeInBundle(bundle);
+        bundle.put(LEFT, left);
+    }
+
+    @Override
+    public void restoreFromBundle(Bundle bundle) {
+        super.restoreFromBundle(bundle);
+        left = bundle.getFloat(LEFT);
+    }
+}

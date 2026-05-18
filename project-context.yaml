@@ -1,0 +1,117 @@
+project:
+  name: Shattered Pixel Dungeon
+  description: Open-source traditional roguelike dungeon crawler, a fork of Pixel Dungeon by Watabou
+  version: 3.3.8
+  package: com.shatteredpixel.shatteredpixeldungeon
+  repository: https://github.com/HomemadeCookies/shattered-pixel-dungeon
+  license: GPL-3.0
+
+tech_stack:
+  language: Java
+  java_compatibility: Java 11 (source/target)
+  build_system: Gradle (Groovy DSL)
+  gradle_version: wrapper-based
+  framework: libGDX 1.14.0
+
+  platforms:
+    - android:
+        min_sdk: 21      # Android 5.0
+        target_sdk: 36   # Android 15
+        compile_sdk: 36
+        plugin: com.android.tools.build:gradle:9.1.0
+    - desktop:
+        backend: LWJGL3 (libGDX backend)
+        packaging: org.beryx.runtime (jpackage / jlink)
+        jdk: Temurin 17 (bundled for distribution)
+    - ios:
+        framework: RoboVM 2.3.24
+
+  graphics: libGDX (OpenGL ES / GL30), custom sprite/tile rendering
+  audio: libGDX audio
+  controllers: gdx-controllers 2.2.4
+  freetype: gdx-freetype 1.14.0
+  crash_dialog: LWJGL tinyFD 3.3.3 (desktop)
+
+  database: none (custom binary serialization via Bundle/BundleSerializer)
+  testing: none declared (manual QA)
+  ci_cd: none detected
+
+modules:
+  - name: SPD-classes
+    path: SPD-classes/
+    role: Shared engine utilities — libGDX wrappers (noosa scene graph, glwrap, gltextures, utils, input)
+    package_root: com.watabou
+
+  - name: core
+    path: core/
+    role: All game logic — actors, items, levels, scenes, UI, effects, messages, services
+    package_root: com.shatteredpixel.shatteredpixeldungeon
+    depends_on: [SPD-classes, services]
+
+  - name: android
+    path: android/
+    role: Android platform launcher and APK packaging
+    depends_on: [core]
+
+  - name: desktop
+    path: desktop/
+    role: Desktop (Windows/macOS/Linux) launcher and native image packaging
+    depends_on: [core, services:updates:githubUpdates, services:news:shatteredNews]
+    main_class: com.shatteredpixel.shatteredpixeldungeon.desktop.DesktopLauncher
+
+  - name: ios
+    path: ios/
+    role: iOS launcher via RoboVM
+    depends_on: [core]
+
+  - name: services
+    path: services/
+    role: Service abstraction layer
+    submodules:
+      - services/updates/debugUpdates
+      - services/updates/githubUpdates
+      - services/news/debugNews
+      - services/news/shatteredNews
+
+architecture:
+  pattern: Modular multi-platform libGDX game
+  scene_graph: Noosa (custom libGDX scene graph in SPD-classes)
+  game_loop: libGDX ApplicationListener → ShatteredPixelDungeon entry point
+  asset_location: core/src/main/assets/
+
+  core_packages:
+    actors: Game entities (hero, mobs, buffs, blobs, NPCs, abilities, spells)
+    items: All collectibles (weapons, armor, potions, scrolls, wands, rings, artifacts, trinkets, etc.)
+    levels: Level generation (builders, painters, rooms, traps, features)
+    scenes: Game screens (GameScene, TitleScene, InterlevelScene, etc.)
+    ui: HUD and UI elements
+    windows: Dialog/popup windows
+    effects: Visual effects
+    sprites: Visual representations of actors/items
+    messages: Localization system
+    journal: Lore and catalog tracking
+    mechanics: Game mechanics utilities
+    plants: Plant entities
+    tiles: Tile definitions and custom tile rendering
+    utils: Game-wide utilities
+
+localization:
+  system: Custom properties-based messages
+  supported_locales:
+    - en, zh-rCN, ko, ru, es, pt, fr, de, zh-rTW, ja, pl, it, tr, vi, uk, id, cs, nl, sv, hu, fi, el, be, eo
+  asset_path: core/src/main/assets/messages/
+
+build_commands:
+  android_debug: ./gradlew android:assembleDebug
+  android_release: ./gradlew android:assembleRelease
+  desktop_run: ./gradlew desktop:debug
+  desktop_release_jar: ./gradlew desktop:release
+  desktop_package: ./gradlew desktop:jpackageImage
+
+contribution:
+  note: This repository does not accept pull requests. Issues welcome.
+  guides:
+    android: docs/getting-started-android.md
+    desktop: docs/getting-started-desktop.md
+    ios: docs/getting-started-ios.md
+    customization: docs/recommended-changes.md

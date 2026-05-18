@@ -1,0 +1,39 @@
+# Code Generation Templates — Shattered Pixel Dungeon
+# Java 11 / libGDX game templates
+
+version: "1.0.0"
+language: java
+base_package: com.shatteredpixel.shatteredpixeldungeon
+
+templates:
+  - name: new-item
+    file: java/new-item.hbs
+    description: "New Item subclass (generic)"
+    output_path: "core/src/main/java/com/shatteredpixel/shatteredpixeldungeon/items/{{name}}.java"
+    variables:
+      - name: Name
+      - description: Item description
+
+  - name: new-mob
+    file: java/new-mob.hbs
+    description: "New Mob enemy type"
+    output_path: "core/src/main/java/com/shatteredpixel/shatteredpixeldungeon/actors/mobs/{{Name}}.java"
+    variables:
+      - Name: Class name
+      - hp: Starting HP
+      - defenseSkill: Defense value
+
+  - name: new-buff
+    file: java/new-buff.hbs
+    description: "New Buff / status effect"
+    output_path: "core/src/main/java/com/shatteredpixel/shatteredpixeldungeon/actors/buffs/{{Name}}.java"
+    variables:
+      - Name: Class name
+
+  - name: new-room
+    file: java/new-room.hbs
+    description: "New Level Room type"
+    output_path: "core/src/main/java/com/shatteredpixel/shatteredpixeldungeon/levels/rooms/{{type}}/{{Name}}.java"
+    variables:
+      - Name: Class name
+      - type: "standard | special | secret | quest"

@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Desktop Launcher (Debug)",
+      "request": "launch",
+      "mainClass": "com.shatteredpixel.shatteredpixeldungeon.desktop.DesktopLauncher",
+      "projectName": "desktop",
+      "vmArgs": "-XstartOnFirstThread",
+      "env": {
+        "SPECIFICATION_TITLE": "Shattered Pixel Dungeon",
+        "IMPLEMENTATION_TITLE": "com.shatteredpixel.shatteredpixeldungeon",
+        "SPECIFICATION_VERSION": "3.3.8-INDEV"
+      }
+    }
+  ]
+}

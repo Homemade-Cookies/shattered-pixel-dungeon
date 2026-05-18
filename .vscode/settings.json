@@ -1,0 +1,44 @@
+{
+  "editor.formatOnSave": true,
+  "editor.tabSize": 4,
+  "editor.insertSpaces": false,
+  "editor.detectIndentation": false,
+
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.jdt.ls.java.home": "",
+  "java.project.importOnFirstTimeStartup": "automatic",
+  "java.project.referencedLibraries": [
+    "**/*.jar"
+  ],
+
+  "files.exclude": {
+    "**/.gradle": true,
+    "**/build": true,
+    "**/.idea": true,
+    "**/*.class": true
+  },
+  "search.exclude": {
+    "**/build": true,
+    "**/.gradle": true,
+    "**/node_modules": true,
+    "**/*.class": true,
+    "**/libs/**/*.jar": true
+  },
+
+  "files.associations": {
+    "*.gradle": "groovy",
+    "*.properties": "properties"
+  },
+
+  "editor.rulers": [120],
+  "editor.wordWrap": "off",
+
+  "terminal.integrated.defaultProfile.osx": "zsh",
+
+  "gradle.nestedProjects": true,
+  "gradle.autoDetect": "on",
+
+  "git.autofetch": true,
+  "git.confirmSync": false
+}
