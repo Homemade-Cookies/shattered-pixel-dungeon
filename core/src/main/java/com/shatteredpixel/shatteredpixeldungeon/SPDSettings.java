@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Languages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene;
@@ -265,7 +266,7 @@ public class SPDSettings extends GameSettings {
 	}
 
 	public static int startWeapon() {
-		return getInt( KEY_START_WEAPON, 0, 0, 7 );
+		return getInt( KEY_START_WEAPON, 0, 0, HeroClass.StartingWeapon.values().length-1 );
 	}
 
 	public static void lastDaily( long value ){

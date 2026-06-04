@@ -860,33 +860,6 @@ public class HeroSelectScene extends PixelScene {
 				if (cls.isUnlocked()) unlockedCount++;
 			}
 
-			private void updateStartWeaponButton(){
-				startWeaponButton.text(Messages.get(HeroSelectScene.class, "start_weapon") + ": "
-						+ startWeaponOptionName(HeroClass.StartingWeapon.get(SPDSettings.startWeapon())));
-			}
-
-			private String startWeaponOptionName(HeroClass.StartingWeapon option){
-				switch (option){
-					case CLASS_DEFAULT:
-						return Messages.get(HeroSelectScene.class, "start_weapon_default");
-					case RANDOM:
-						return Messages.get(HeroSelectScene.class, "start_weapon_random");
-					case WORN_SHORTSWORD:
-						return Messages.titleCase(new WornShortsword().name());
-					case MAGES_STAFF:
-						return Messages.titleCase(new MagesStaff(new WandOfMagicMissile()).name());
-					case DAGGER:
-						return Messages.titleCase(new Dagger().name());
-					case GLOVES:
-						return Messages.titleCase(new Gloves().name());
-					case RAPIER:
-						return Messages.titleCase(new Rapier().name());
-					case CUDGEL:
-					default:
-						return Messages.titleCase(new Cudgel().name());
-				}
-			}
-
 			if (unlockedCount >= 2) {
 				StyledButton randomButton = new StyledButton(Chrome.Type.BLANK, Messages.get(HeroSelectScene.class, "randomize"), 6) {
 					@Override
@@ -915,6 +888,33 @@ public class HeroSelectScene extends PixelScene {
 				ColorBlock spc = new ColorBlock(1, 1, 0xFF000000);
 				add(spc);
 				spacers.add(spc);
+			}
+		}
+
+		private void updateStartWeaponButton(){
+			startWeaponButton.text(Messages.get(HeroSelectScene.class, "start_weapon") + ": "
+					+ startWeaponOptionName(HeroClass.StartingWeapon.get(SPDSettings.startWeapon())));
+		}
+
+		private String startWeaponOptionName(HeroClass.StartingWeapon option){
+			switch (option){
+				case CLASS_DEFAULT:
+					return Messages.get(HeroSelectScene.class, "start_weapon_default");
+				case RANDOM:
+					return Messages.get(HeroSelectScene.class, "start_weapon_random");
+				case WORN_SHORTSWORD:
+					return Messages.titleCase(new WornShortsword().name());
+				case MAGES_STAFF:
+					return Messages.titleCase(new MagesStaff(new WandOfMagicMissile()).name());
+				case DAGGER:
+					return Messages.titleCase(new Dagger().name());
+				case GLOVES:
+					return Messages.titleCase(new Gloves().name());
+				case RAPIER:
+					return Messages.titleCase(new Rapier().name());
+				case CUDGEL:
+				default:
+					return Messages.titleCase(new Cudgel().name());
 			}
 		}
 
