@@ -729,7 +729,7 @@ public abstract class RegularLevel extends Level {
 		return null;
 	}
 
-	protected int randomDropCell(){
+	public int randomDropCell(){
 		return randomDropCell(StandardRoom.class);
 	}
 	

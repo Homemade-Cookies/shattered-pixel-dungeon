@@ -60,11 +60,35 @@ public class MobSpawner extends Actor {
 	}
 
 	public static ArrayList<Class<? extends Mob>> getMobRotation(int depth ){
+		if (Dungeon.endless) {
+			ArrayList<Class<? extends Mob>> mobs = standardMobRotation( randomEndlessDepth(depth) );
+			swapMobAlts(mobs);
+			Random.shuffle(mobs);
+			return mobs;
+		}
 		ArrayList<Class<? extends Mob>> mobs = standardMobRotation( depth );
 		addRareMobs(depth, mobs);
 		swapMobAlts(mobs);
 		Random.shuffle(mobs);
 		return mobs;
+	}
+
+	// Returns a random depth from the pool of unlocked mob tiers for endless mode.
+	// As the player descends, more mob tiers become available.
+	private static int randomEndlessDepth(int depth) {
+		// Sewer (1-4): always available
+		// Prison (6-9): available after depth 5
+		// Caves (11-14): available after depth 10
+		// City (16-19): available after depth 15
+		// Halls (21-24): available after depth 20
+		int availableTiers = Math.min(5, 1 + (depth - 1) / 5);
+		switch (Random.Int(availableTiers)) {
+			case 0:  return 1  + Random.Int(4);
+			case 1:  return 6  + Random.Int(4);
+			case 2:  return 11 + Random.Int(4);
+			case 3:  return 16 + Random.Int(4);
+			default: return 21 + Random.Int(4);
+		}
 	}
 
 	//returns a rotation of standard mobs, unshuffled.

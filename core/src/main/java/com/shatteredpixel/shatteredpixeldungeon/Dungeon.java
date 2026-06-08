@@ -49,8 +49,10 @@ import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.TalismanOfForesight;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.Potion;
+import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfStrength;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.Scroll;
+import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfUpgrade;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfRegrowth;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfWarding;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Notes;
@@ -295,13 +297,34 @@ public class Dungeon {
 		return generatedLevels.contains(depth + 1000*branch);
 	}
 	
-	private static Level randomBiomeLevel(boolean boss) {
+	private static Level randomBiomeLevel() {
 		switch (Random.Int(5)) {
-			case 0:  return boss ? new SewerBossLevel()  : new SewerLevel();
-			case 1:  return boss ? new PrisonBossLevel() : new PrisonLevel();
-			case 2:  return boss ? new CavesBossLevel()  : new CavesLevel();
-			case 3:  return boss ? new CityBossLevel()   : new CityLevel();
-			default: return boss ? new HallsBossLevel()  : new HallsLevel();
+			case 0:  return new SewerLevel();
+			case 1:  return new PrisonLevel();
+			case 2:  return new CavesLevel();
+			case 3:  return new CityLevel();
+			default: return new HallsLevel();
+		}
+	}
+
+	// Generates a pool of boss-tier items (rings, wands, artifacts) for the endless boss chest.
+	// The pool is stored in the chest so items the hero already owns can be skipped (rerolled).
+	private static void addEndlessBossChest(RegularLevel level) {
+		int pos = level.randomDropCell();
+		ArrayList<Item> pool = new ArrayList<>();
+		pool.add(Generator.random(Generator.Category.RING));
+		pool.add(Generator.random(Generator.Category.WAND));
+		pool.add(Generator.random(Generator.Category.ARTIFACT));
+		pool.add(Generator.random(Generator.Category.RING));
+		pool.add(Generator.random(Generator.Category.WAND));
+		pool.add(new ScrollOfUpgrade());
+		pool.add(new PotionOfStrength());
+
+		Heap chest = level.drop(pool.get(0), pos);
+		chest.type = Heap.Type.CHEST;
+		chest.bossTreasure = true;
+		for (int i = 1; i < pool.size(); i++) {
+			chest.items.addLast(pool.get(i));
 		}
 	}
 
@@ -312,10 +335,9 @@ public class Dungeon {
 		
 		Level level;
 		if (branch == 0 && endless) {
-			// Endless mode: randomly select a level type each floor.
-			// Boss levels appear at every depth divisible by 5 (depth 5, 10, 15, ...).
+			// Endless mode: randomly select a regular level type each floor.
 			// Shops appear at depth % 5 == 1, starting from depth 6 (depths 6, 11, 16, ...).
-			level = randomBiomeLevel(bossLevel(depth));
+			level = randomBiomeLevel();
 		} else if (branch == 0) {
 			switch (depth) {
 				case 1:
@@ -412,6 +434,10 @@ public class Dungeon {
 		Statistics.qualifiedForBossRemainsBadge = false;
 		
 		level.create();
+
+		if (endless && bossLevel(depth) && level instanceof RegularLevel) {
+			addEndlessBossChest((RegularLevel) level);
+		}
 		
 		if (branch == 0) Statistics.qualifiedForNoKilling = !bossLevel();
 		Statistics.qualifiedForBossChallengeBadge = false;

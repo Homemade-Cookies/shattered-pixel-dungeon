@@ -78,6 +78,7 @@ public class Heap implements Bundlable {
 	public boolean haunted = false;
 	public boolean autoExplored = false; //used to determine if this heap should count for exploration bonus
 	public boolean hidden = false; //sets alpha to 15%
+	public boolean bossTreasure = false; //if true, auto-rerolls items the hero already owns when opened
 	
 	public LinkedList<Item> items = new LinkedList<>();
 	
@@ -106,6 +107,13 @@ public class Heap implements Bundlable {
 		}
 
 		type = Type.HEAP;
+		if (bossTreasure) {
+			// Reroll items the hero already owns (skip to first item they don't have)
+			while (items.size() > 1 && Dungeon.hero.belongings.getItem(items.peek().getClass()) != null) {
+				items.removeFirst();
+			}
+			bossTreasure = false;
+		}
 		ArrayList<Item> bonus = RingOfWealth.tryForBonusDrop(hero, 1);
 		if (bonus != null && !bonus.isEmpty()) {
 			items.addAll(0, bonus);
@@ -422,6 +430,7 @@ public class Heap implements Bundlable {
 	private static final String HAUNTED	= "haunted";
 	private static final String AUTO_EXPLORED	= "auto_explored";
 	private static final String HIDDEN	= "hidden";
+	private static final String BOSS_TREASURE	= "boss_treasure";
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -448,6 +457,7 @@ public class Heap implements Bundlable {
 		haunted = bundle.getBoolean( HAUNTED );
 		autoExplored = bundle.getBoolean( AUTO_EXPLORED );
 		hidden = bundle.getBoolean( HIDDEN );
+		bossTreasure = bundle.getBoolean( BOSS_TREASURE );
 	}
 
 	@Override
@@ -459,6 +469,7 @@ public class Heap implements Bundlable {
 		bundle.put( HAUNTED, haunted );
 		bundle.put( AUTO_EXPLORED, autoExplored );
 		bundle.put( HIDDEN, hidden );
+		bundle.put( BOSS_TREASURE, bossTreasure );
 	}
 	
 }
