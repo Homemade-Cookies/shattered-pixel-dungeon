@@ -120,12 +120,12 @@ public class Heap implements Bundlable {
 				Item item = items.get(i);
 				if (item instanceof Artifact) {
 					Artifact artifact = (Artifact) item;
-					if (hero.belongings.getItem(artifact.getClass()) != null) {
+					while (hero.belongings.getItem(artifact.getClass()) != null) {
 						Artifact rerolled = Generator.randomArtifact();
-						if (rerolled != null) {
-							items.set(i, rerolled);
-							GLog.p(Messages.get(Heap.class, "endless_boss_reroll", artifact.name(), rerolled.name()));
-						}
+						if (rerolled == null) break; // pool exhausted
+						GLog.p(Messages.get(Heap.class, "endless_boss_reroll", artifact.name(), rerolled.name()));
+						items.set(i, rerolled);
+						artifact = rerolled;
 					}
 					break; // only one artifact per boss chest
 				}
@@ -482,7 +482,7 @@ public class Heap implements Bundlable {
 		bundle.put( HAUNTED, haunted );
 		bundle.put( AUTO_EXPLORED, autoExplored );
 		bundle.put( HIDDEN, hidden );
-		if (endlessBossReward) bundle.put( ENDLESS_BOSS_REWARD, endlessBossReward );
+		bundle.put( ENDLESS_BOSS_REWARD, endlessBossReward );
 	}
 	
 }
