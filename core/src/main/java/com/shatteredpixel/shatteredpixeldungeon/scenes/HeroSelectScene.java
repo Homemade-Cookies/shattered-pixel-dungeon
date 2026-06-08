@@ -163,6 +163,7 @@ public class HeroSelectScene extends PixelScene {
 
 				Dungeon.hero = null;
 				Dungeon.daily = Dungeon.dailyReplay = false;
+				Dungeon.endless = false;
 				Dungeon.initSeed();
 				ActionIndicator.clearAction();
 				InterlevelScene.mode = InterlevelScene.Mode.DESCEND;
@@ -759,6 +760,7 @@ public class HeroSelectScene extends PixelScene {
 
 								Dungeon.hero = null;
 								Dungeon.daily = true;
+								Dungeon.endless = false;
 								Dungeon.initSeed();
 								ActionIndicator.clearAction();
 								InterlevelScene.mode = InterlevelScene.Mode.DESCEND;
@@ -802,6 +804,45 @@ public class HeroSelectScene extends PixelScene {
 			dailyButton.icon(Icons.get(Icons.CALENDAR));
 			add(dailyButton);
 			buttons.add(dailyButton);
+
+			StyledButton endlessButton = new StyledButton(Chrome.Type.BLANK, Messages.get(HeroSelectScene.class, "endless"), 6){
+				@Override
+				protected void onClick() {
+					super.onClick();
+
+					for (GamesInProgress.Info game : GamesInProgress.checkAll()){
+						if (game.endless){
+							ShatteredPixelDungeon.scene().addToFront(new WndMessage(Messages.get(HeroSelectScene.class, "endless_existing")));
+							return;
+						}
+					}
+
+					ShatteredPixelDungeon.scene().addToFront(new WndOptions(
+							Icons.get(Icons.SKULL),
+							Messages.get(HeroSelectScene.class, "endless"),
+							Messages.get(HeroSelectScene.class, "endless_desc"),
+							Messages.get(HeroSelectScene.class, "endless_yes"),
+							Messages.get(HeroSelectScene.class, "endless_no")){
+						@Override
+						protected void onSelect(int index) {
+							if (index == 0){
+								Dungeon.hero = null;
+								Dungeon.daily = Dungeon.dailyReplay = false;
+								Dungeon.endless = true;
+								Dungeon.initSeed();
+								ActionIndicator.clearAction();
+								InterlevelScene.mode = InterlevelScene.Mode.DESCEND;
+
+								Game.switchScene( InterlevelScene.class );
+							}
+						}
+					});
+				}
+			};
+			endlessButton.leftJustify = true;
+			endlessButton.icon(Icons.get(Icons.SKULL));
+			add(endlessButton);
+			buttons.add(endlessButton);
 
 			challengeButton = new StyledButton(Chrome.Type.BLANK, Messages.get(WndChallenges.class, "title"), 6){
 				@Override

@@ -568,6 +568,15 @@ public abstract class Level implements Bundlable {
 			return false;
 		}
 
+		// In endless mode, block going back to previous levels or the surface
+		if (Dungeon.endless &&
+				(transition.type == LevelTransition.Type.SURFACE
+						|| transition.type == LevelTransition.Type.REGULAR_ENTRANCE
+						|| transition.type == LevelTransition.Type.BRANCH_ENTRANCE)) {
+			GLog.w(Messages.get(Level.class, "endless_no_return"));
+			return false;
+		}
+
 		beforeTransition();
 		InterlevelScene.curTransition = transition;
 		if (transition.type == LevelTransition.Type.REGULAR_EXIT

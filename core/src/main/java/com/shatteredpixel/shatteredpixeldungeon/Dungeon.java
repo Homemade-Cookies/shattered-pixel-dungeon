@@ -209,6 +209,7 @@ public class Dungeon {
 
 	public static boolean daily;
 	public static boolean dailyReplay;
+	public static boolean endless;
 	public static String customSeedText = "";
 	public static long seed;
 	public static long lastPlayed;
@@ -300,7 +301,27 @@ public class Dungeon {
 		Actor.clear();
 		
 		Level level;
-		if (branch == 0) {
+		if (branch == 0 && endless) {
+			// Endless mode: randomly select a level type each floor.
+			// Boss levels appear every 5 depths; shops appear on depth % 5 == 1 (after depth 1).
+			if (bossLevel(depth)) {
+				switch (Random.Int(5)) {
+					case 0:  level = new SewerBossLevel();  break;
+					case 1:  level = new PrisonBossLevel(); break;
+					case 2:  level = new CavesBossLevel();  break;
+					case 3:  level = new CityBossLevel();   break;
+					default: level = new HallsBossLevel();  break;
+				}
+			} else {
+				switch (Random.Int(5)) {
+					case 0:  level = new SewerLevel();  break;
+					case 1:  level = new PrisonLevel(); break;
+					case 2:  level = new CavesLevel();  break;
+					case 3:  level = new CityLevel();   break;
+					default: level = new HallsLevel();  break;
+				}
+			}
+		} else if (branch == 0) {
 			switch (depth) {
 				case 1:
 				case 2:
@@ -431,6 +452,10 @@ public class Dungeon {
 	}
 	
 	public static boolean shopOnLevel() {
+		if (endless) {
+			// Shop appears every 5 floors starting at depth 6 (depth % 5 == 1, depth > 1)
+			return depth % 5 == 1 && depth > 1;
+		}
 		return depth == 6 || depth == 11 || depth == 16;
 	}
 	
@@ -439,6 +464,9 @@ public class Dungeon {
 	}
 	
 	public static boolean bossLevel( int depth ) {
+		if (endless) {
+			return depth % 5 == 0 && depth > 0;
+		}
 		return depth == 5 || depth == 10 || depth == 15 || depth == 20 || depth == 25;
 	}
 
@@ -604,6 +632,7 @@ public class Dungeon {
 	private static final String CUSTOM_SEED	= "custom_seed";
 	private static final String DAILY	    = "daily";
 	private static final String DAILY_REPLAY= "daily_replay";
+	private static final String ENDLESS     = "endless";
 	private static final String LAST_PLAYED = "last_played";
 	private static final String CHALLENGES	= "challenges";
 	private static final String MOBS_TO_CHAMPION	= "mobs_to_champion";
@@ -631,6 +660,7 @@ public class Dungeon {
 			bundle.put( CUSTOM_SEED, customSeedText );
 			bundle.put( DAILY, daily );
 			bundle.put( DAILY_REPLAY, dailyReplay );
+			bundle.put( ENDLESS, endless );
 			bundle.put( LAST_PLAYED, lastPlayed = Game.realTime);
 			bundle.put( CHALLENGES, challenges );
 			bundle.put( MOBS_TO_CHAMPION, mobsToChampion );
@@ -731,6 +761,7 @@ public class Dungeon {
 		customSeedText = bundle.getString( CUSTOM_SEED );
 		daily = bundle.getBoolean( DAILY );
 		dailyReplay = bundle.getBoolean( DAILY_REPLAY );
+		endless = bundle.getBoolean( ENDLESS );
 
 		Actor.clear();
 		Actor.restoreNextID( bundle );
@@ -863,6 +894,7 @@ public class Dungeon {
 		info.customSeed = bundle.getString( CUSTOM_SEED );
 		info.daily = bundle.getBoolean( DAILY );
 		info.dailyReplay = bundle.getBoolean( DAILY_REPLAY );
+		info.endless = bundle.getBoolean( ENDLESS );
 		info.lastPlayed = bundle.getLong( LAST_PLAYED );
 
 		Hero.preview( info, bundle.getBundle( HERO ) );

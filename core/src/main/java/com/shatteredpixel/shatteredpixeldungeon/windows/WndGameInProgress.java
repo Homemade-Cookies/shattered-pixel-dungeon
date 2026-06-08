@@ -105,6 +105,8 @@ public class WndGameInProgress extends Window {
 			} else {
 				statSlot(Messages.get(this, "daily_for"), "_" + info.customSeed + "_");
 			}
+		} else if (info.endless) {
+			statSlot(Messages.get(this, "mode"), Messages.get(this, "endless_mode"));
 		} else if (!info.customSeed.isEmpty()){
 			statSlot( Messages.get(this, "custom_seed"), "_" + info.customSeed + "_" );
 		} else {
@@ -122,6 +124,7 @@ public class WndGameInProgress extends Window {
 				
 				Dungeon.hero = null;
 				Dungeon.daily = Dungeon.dailyReplay = false;
+				Dungeon.endless = false;
 				ActionIndicator.clearAction();
 				InterlevelScene.mode = InterlevelScene.Mode.CONTINUE;
 				ShatteredPixelDungeon.switchScene(InterlevelScene.class);
