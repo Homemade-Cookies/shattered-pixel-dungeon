@@ -307,10 +307,12 @@ public class Dungeon {
 		}
 	}
 
-	// Generates a pool of boss-tier items (rings, wands, artifacts) for the endless boss chest.
+	// Generates a pool of boss-tier items (rings, wands, artifacts, upgrade scrolls,
+	// and strength potions) for the endless boss chest.
 	// The pool is stored in the chest so items the hero already owns can be skipped (rerolled).
 	private static void addEndlessBossChest(RegularLevel level) {
 		int pos = level.randomDropCell();
+		if (pos == -1) return;
 		ArrayList<Item> pool = new ArrayList<>();
 		pool.add(Generator.random(Generator.Category.RING));
 		pool.add(Generator.random(Generator.Category.WAND));

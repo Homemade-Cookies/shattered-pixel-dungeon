@@ -109,7 +109,7 @@ public class Heap implements Bundlable {
 		type = Type.HEAP;
 		if (bossTreasure) {
 			// Reroll items the hero already owns (skip to first item they don't have)
-			while (items.size() > 1 && Dungeon.hero.belongings.getItem(items.peek().getClass()) != null) {
+			while (!items.isEmpty() && Dungeon.hero.belongings.getItem(items.peek().getClass()) != null) {
 				items.removeFirst();
 			}
 			bossTreasure = false;

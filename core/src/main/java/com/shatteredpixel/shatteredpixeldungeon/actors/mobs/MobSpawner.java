@@ -73,8 +73,8 @@ public class MobSpawner extends Actor {
 		return mobs;
 	}
 
-	// Returns a random depth from the pool of unlocked mob tiers for endless mode.
-	// As the player descends, more mob tiers become available.
+	// Maps the current endless mode depth to a random depth from available mob tiers.
+	// Tiers unlock progressively as the player descends.
 	private static int randomEndlessDepth(int depth) {
 		// Sewer (1-4): always available
 		// Prison (6-9): available after depth 5
