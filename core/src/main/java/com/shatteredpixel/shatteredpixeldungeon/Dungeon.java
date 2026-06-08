@@ -295,6 +295,16 @@ public class Dungeon {
 		return generatedLevels.contains(depth + 1000*branch);
 	}
 	
+	private static Level randomBiomeLevel(boolean boss) {
+		switch (Random.Int(5)) {
+			case 0:  return boss ? new SewerBossLevel()  : new SewerLevel();
+			case 1:  return boss ? new PrisonBossLevel() : new PrisonLevel();
+			case 2:  return boss ? new CavesBossLevel()  : new CavesLevel();
+			case 3:  return boss ? new CityBossLevel()   : new CityLevel();
+			default: return boss ? new HallsBossLevel()  : new HallsLevel();
+		}
+	}
+
 	public static Level newLevel() {
 		
 		Dungeon.level = null;
@@ -303,24 +313,9 @@ public class Dungeon {
 		Level level;
 		if (branch == 0 && endless) {
 			// Endless mode: randomly select a level type each floor.
-			// Boss levels appear every 5 depths; shops appear on depth % 5 == 1 (after depth 1).
-			if (bossLevel(depth)) {
-				switch (Random.Int(5)) {
-					case 0:  level = new SewerBossLevel();  break;
-					case 1:  level = new PrisonBossLevel(); break;
-					case 2:  level = new CavesBossLevel();  break;
-					case 3:  level = new CityBossLevel();   break;
-					default: level = new HallsBossLevel();  break;
-				}
-			} else {
-				switch (Random.Int(5)) {
-					case 0:  level = new SewerLevel();  break;
-					case 1:  level = new PrisonLevel(); break;
-					case 2:  level = new CavesLevel();  break;
-					case 3:  level = new CityLevel();   break;
-					default: level = new HallsLevel();  break;
-				}
-			}
+			// Boss levels appear at every depth divisible by 5 (depth 5, 10, 15, ...).
+			// Shops appear at depth % 5 == 1, starting from depth 6 (depths 6, 11, 16, ...).
+			level = randomBiomeLevel(bossLevel(depth));
 		} else if (branch == 0) {
 			switch (depth) {
 				case 1:
@@ -453,7 +448,7 @@ public class Dungeon {
 	
 	public static boolean shopOnLevel() {
 		if (endless) {
-			// Shop appears every 5 floors starting at depth 6 (depth % 5 == 1, depth > 1)
+			// Shop appears at depths 6, 11, 16, ... (depth % 5 == 1 and depth > 1)
 			return depth % 5 == 1 && depth > 1;
 		}
 		return depth == 6 || depth == 11 || depth == 16;
