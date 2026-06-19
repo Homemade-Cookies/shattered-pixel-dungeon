@@ -53,9 +53,14 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class WndHero extends WndTabbed {
-	
-	private static final int WIDTH		= 120;
-	private static final int HEIGHT		= 120;
+
+	// Minimum window dimensions.
+	private static final int MIN_WIDTH  = 120;
+	private static final int MIN_HEIGHT = 120;
+
+	// Allow the window to grow to use available screen space.
+	private final int WIDTH;
+	private final int HEIGHT;
 	
 	private StatsTab stats;
 	private TalentsTab talents;
@@ -66,7 +71,11 @@ public class WndHero extends WndTabbed {
 	public WndHero() {
 		
 		super();
-		
+
+		// Grow the window when the screen has room, capped at 200×200.
+		WIDTH  = Math.min(200, Math.max(MIN_WIDTH,  PixelScene.uiCamera.width  - 20));
+		HEIGHT = Math.min(200, Math.max(MIN_HEIGHT, PixelScene.uiCamera.height - 20));
+
 		resize( WIDTH, HEIGHT );
 		
 		stats = new StatsTab();

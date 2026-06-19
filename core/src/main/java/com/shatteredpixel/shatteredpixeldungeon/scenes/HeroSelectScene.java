@@ -856,7 +856,7 @@ public class HeroSelectScene extends PixelScene {
 						return;
 					}
 
-					ShatteredPixelDungeon.scene().addToFront(new WndChallenges(SPDSettings.challenges(), true) {
+					ShatteredPixelDungeon.scene().addToFront(new WndChallenges(SPDSettings.challenges(), true, SPDSettings.crossClassTalents()) {
 						public void onBackPressed() {
 							super.onBackPressed();
 							icon(Icons.get(SPDSettings.challenges() > 0 ? Icons.CHALLENGE_COLOR : Icons.CHALLENGE_GREY));
@@ -1033,7 +1033,7 @@ public class HeroSelectScene extends PixelScene {
 							}
 							SPDSettings.challenges(mask);
 							challengeButton.icon(Icons.get(SPDSettings.challenges() > 0 ? Icons.CHALLENGE_COLOR : Icons.CHALLENGE_GREY));
-							ShatteredPixelDungeon.scene().addToFront(new WndChallenges(mask, false));
+							ShatteredPixelDungeon.scene().addToFront(new WndChallenges(mask, false, SPDSettings.crossClassTalents()));
 						}
 
 						if (chkHero.checked()){

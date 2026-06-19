@@ -221,6 +221,7 @@ public class SPDSettings extends GameSettings {
 	
 	public static final String KEY_LAST_CLASS	= "last_class";
 	public static final String KEY_CHALLENGES	= "challenges";
+	public static final String KEY_CROSS_CLASS_TALENTS = "cross_class_talents";
 	public static final String KEY_CUSTOM_SEED	= "custom_seed";
 	public static final String KEY_START_WEAPON = "start_weapon";
 	public static final String KEY_LAST_DAILY	= "last_daily";
@@ -251,6 +252,14 @@ public class SPDSettings extends GameSettings {
 	
 	public static int challenges() {
 		return getInt( KEY_CHALLENGES, 0, 0, Challenges.MAX_VALUE );
+	}
+
+	public static void crossClassTalents( boolean value ) {
+		put( KEY_CROSS_CLASS_TALENTS, value );
+	}
+
+	public static boolean crossClassTalents() {
+		return getBoolean( KEY_CROSS_CLASS_TALENTS, false );
 	}
 
 	public static void customSeed( String value ){

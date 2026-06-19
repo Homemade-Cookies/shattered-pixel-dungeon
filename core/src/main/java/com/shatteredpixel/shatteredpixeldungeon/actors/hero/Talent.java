@@ -1060,6 +1060,93 @@ public enum Talent {
 
 		//tier4
 		//TBD
+
+		//cross-class talents: add other classes' tier talents so the player can spend points on them
+		if (Dungeon.crossClassTalents) {
+			for (HeroClass otherCls : HeroClass.values()) {
+				if (otherCls == cls) continue;
+
+				ArrayList<Talent> crossTalents = new ArrayList<>();
+
+				// other class tier 1
+				switch (otherCls) {
+					case WARRIOR: default:
+						Collections.addAll(crossTalents, HEARTY_MEAL, VETERANS_INTUITION, PROVOKED_ANGER, IRON_WILL);
+						break;
+					case MAGE:
+						Collections.addAll(crossTalents, EMPOWERING_MEAL, SCHOLARS_INTUITION, LINGERING_MAGIC, BACKUP_BARRIER);
+						break;
+					case ROGUE:
+						Collections.addAll(crossTalents, CACHED_RATIONS, THIEFS_INTUITION, SUCKER_PUNCH, PROTECTIVE_SHADOWS);
+						break;
+					case HUNTRESS:
+						Collections.addAll(crossTalents, NATURES_BOUNTY, SURVIVALISTS_INTUITION, FOLLOWUP_STRIKE, NATURES_AID);
+						break;
+					case DUELIST:
+						Collections.addAll(crossTalents, STRENGTHENING_MEAL, ADVENTURERS_INTUITION, PATIENT_STRIKE, AGGRESSIVE_BARRIER);
+						break;
+					case CLERIC:
+						Collections.addAll(crossTalents, SATIATED_SPELLS, HOLY_INTUITION, SEARING_LIGHT, SHIELD_OF_LIGHT);
+						break;
+				}
+				for (Talent talent : crossTalents) {
+					talents.get(0).putIfAbsent(talent, 0);
+				}
+				crossTalents.clear();
+
+				// other class tier 2
+				switch (otherCls) {
+					case WARRIOR: default:
+						Collections.addAll(crossTalents, IRON_STOMACH, LIQUID_WILLPOWER, RUNIC_TRANSFERENCE, LETHAL_MOMENTUM, IMPROVISED_PROJECTILES);
+						break;
+					case MAGE:
+						Collections.addAll(crossTalents, ENERGIZING_MEAL, INSCRIBED_POWER, WAND_PRESERVATION, ARCANE_VISION, SHIELD_BATTERY);
+						break;
+					case ROGUE:
+						Collections.addAll(crossTalents, MYSTICAL_MEAL, INSCRIBED_STEALTH, WIDE_SEARCH, SILENT_STEPS, ROGUES_FORESIGHT);
+						break;
+					case HUNTRESS:
+						Collections.addAll(crossTalents, INVIGORATING_MEAL, LIQUID_NATURE, REJUVENATING_STEPS, HEIGHTENED_SENSES, DURABLE_PROJECTILES);
+						break;
+					case DUELIST:
+						Collections.addAll(crossTalents, FOCUSED_MEAL, LIQUID_AGILITY, WEAPON_RECHARGING, LETHAL_HASTE, SWIFT_EQUIP);
+						break;
+					case CLERIC:
+						Collections.addAll(crossTalents, ENLIGHTENING_MEAL, RECALL_INSCRIPTION, SUNRAY, DIVINE_SENSE, BLESS);
+						break;
+				}
+				for (Talent talent : crossTalents) {
+					talents.get(1).putIfAbsent(talent, 0);
+				}
+				crossTalents.clear();
+
+				// other class tier 3 (class talents only, not subclass)
+				switch (otherCls) {
+					case WARRIOR: default:
+						Collections.addAll(crossTalents, HOLD_FAST, STRONGMAN);
+						break;
+					case MAGE:
+						Collections.addAll(crossTalents, DESPERATE_POWER, ALLY_WARP);
+						break;
+					case ROGUE:
+						Collections.addAll(crossTalents, ENHANCED_RINGS, LIGHT_CLOAK);
+						break;
+					case HUNTRESS:
+						Collections.addAll(crossTalents, POINT_BLANK, SEER_SHOT);
+						break;
+					case DUELIST:
+						Collections.addAll(crossTalents, PRECISE_ASSAULT, DEADLY_FOLLOWUP);
+						break;
+					case CLERIC:
+						Collections.addAll(crossTalents, CLEANSE, LIGHT_READING);
+						break;
+				}
+				for (Talent talent : crossTalents) {
+					talents.get(2).putIfAbsent(talent, 0);
+				}
+				crossTalents.clear();
+			}
+		}
 	}
 
 	public static void initSubclassTalents( Hero hero ){

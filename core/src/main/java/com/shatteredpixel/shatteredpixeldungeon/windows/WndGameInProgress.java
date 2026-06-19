@@ -75,7 +75,7 @@ public class WndGameInProgress extends Window {
 			RedButton btnChallenges = new RedButton( Messages.get(this, "challenges") ) {
 				@Override
 				protected void onClick() {
-					Game.scene().add( new WndChallenges( info.challenges, false ) );
+					Game.scene().add( new WndChallenges( info.challenges, false, info.crossClassTalents ) );
 				}
 			};
 			btnChallenges.icon(Icons.get(Icons.CHALLENGE_COLOR));

@@ -85,7 +85,14 @@ public class TalentsPane extends ScrollPane {
 
 		tiersAvailable = Math.min(tiersAvailable, talents.size());
 
-		for (int i = 0; i < Math.min(tiersAvailable, talents.size()); i++){
+		// For INFO mode, only show tiers up to tiersAvailable (badge-gated).
+		// For all other modes (UPGRADE, METAMORPH, etc.), show every tier that has
+		// already been initialized in the talents list so the player can preview
+		// upcoming talents. The level/subclass gate is enforced inside each
+		// TalentButton — locked tiers are visible and readable but cannot be leveled.
+		int tiersToShow = (mode == TalentButton.Mode.INFO) ? tiersAvailable : talents.size();
+
+		for (int i = 0; i < tiersToShow; i++){
 			if (talents.get(i).isEmpty()) continue;
 
 			TalentTierPane pane = new TalentTierPane(talents.get(i), i+1, mode);
@@ -103,17 +110,33 @@ public class TalentsPane extends ScrollPane {
 		blocker = new ColorBlock(0, 0, 0xFF222222);
 		content.add(blocker);
 
-		if (tiersAvailable == 1) {
-			blockText = PixelScene.renderTextBlock(Messages.get(this, "unlock_tier2"), 6);
-			content.add(blockText);
-		} else if (tiersAvailable == 2) {
-			blockText = PixelScene.renderTextBlock(Messages.get(this, "unlock_tier3"), 6);
-			content.add(blockText);
-		} else if (tiersAvailable == 3) {
-			blockText = PixelScene.renderTextBlock(Messages.get(this, "unlock_tier4"), 6);
-			content.add(blockText);
+		if (mode == TalentButton.Mode.INFO) {
+			// INFO mode: gate block text by badge progress as before
+			if (tiersAvailable == 1) {
+				blockText = PixelScene.renderTextBlock(Messages.get(this, "unlock_tier2"), 6);
+				content.add(blockText);
+			} else if (tiersAvailable == 2) {
+				blockText = PixelScene.renderTextBlock(Messages.get(this, "unlock_tier3"), 6);
+				content.add(blockText);
+			} else if (tiersAvailable == 3) {
+				blockText = PixelScene.renderTextBlock(Messages.get(this, "unlock_tier4"), 6);
+				content.add(blockText);
+			} else {
+				blockText = null;
+			}
 		} else {
-			blockText = null;
+			// UPGRADE/METAMORPH modes: only block for tiers not yet initialized.
+			// Tiers 1 & 2 are always present; tier 3 appears after subclass selection;
+			// tier 4 appears after an armor ability is chosen.
+			if (talents.size() < 3) {
+				blockText = PixelScene.renderTextBlock(Messages.get(this, "unlock_tier3"), 6);
+				content.add(blockText);
+			} else if (talents.size() < 4) {
+				blockText = PixelScene.renderTextBlock(Messages.get(this, "unlock_tier4"), 6);
+				content.add(blockText);
+			} else {
+				blockText = null;
+			}
 		}
 
 		for (int i = panes.size()-1; i >= 0; i--){
@@ -164,6 +187,7 @@ public class TalentsPane extends ScrollPane {
 		private int tier;
 
 		public RenderedTextBlock title;
+		Image heroIcon;
 		ArrayList<TalentButton> buttons;
 
 		ArrayList<Image> stars = new ArrayList<>();
@@ -177,6 +201,11 @@ public class TalentsPane extends ScrollPane {
 			title = PixelScene.renderTextBlock(Messages.titleCase(Messages.get(TalentsPane.class, "tier", tier)), 9);
 			title.hardlight(Window.TITLE_COLOR);
 			add(title);
+
+			if (Dungeon.hero != null) {
+				heroIcon = new Image(Dungeon.hero.heroClass.spritesheet(), 0, 90, 12, 15);
+				add(heroIcon);
+			}
 
 			if (mode == TalentButton.Mode.UPGRADE) {
 				setupStars();
@@ -282,9 +311,16 @@ public class TalentsPane extends ScrollPane {
 
 			int regStars = Talent.tierLevelThresholds[tier+1] - Talent.tierLevelThresholds[tier];
 
-			float titleWidth = title.width();
+			float iconExtraWidth = heroIcon != null ? (heroIcon.width() + 2) : 0;
+			float titleWidth = title.width() + iconExtraWidth;
 			titleWidth += 2 + Math.min(stars.size(), regStars)*6;
-			title.setPos(x + (width - titleWidth)/2f, y);
+			title.setPos(x + (width - titleWidth)/2f + iconExtraWidth, y);
+
+			if (heroIcon != null) {
+				heroIcon.x = title.left() - heroIcon.width() - 2;
+				heroIcon.y = title.top() + (title.height() - heroIcon.height()) / 2f;
+				PixelScene.align(heroIcon);
+			}
 
 			float left = title.right() + 2;
 
@@ -307,15 +343,30 @@ public class TalentsPane extends ScrollPane {
 				random.setRect(width - 16, y-2, 16, 14);
 			}
 
-			float gap = (width - buttons.size()*TalentButton.WIDTH)/(buttons.size()+1);
-			left = x + gap;
-			for (TalentButton btn : buttons){
-				btn.setPos(left, title.bottom() + 4);
-				PixelScene.align(btn);
-				left += btn.width() + gap;
+			// Wrap buttons into rows of up to 4 (the standard number of talents per tier).
+			// When cross-class talents push the count beyond 4, extra buttons spill onto
+			// additional rows so nothing gets squeezed or clipped.
+			int buttonsPerRow = Math.min(buttons.size(), 4);
+			int numRows = (int) Math.ceil(buttons.size() / (float) buttonsPerRow);
+
+			float rowGap = (width - buttonsPerRow * TalentButton.WIDTH) / (buttonsPerRow + 1);
+			float rowTop = title.bottom() + 4;
+			for (int row = 0; row < numRows; row++) {
+				int rowStart = row * buttonsPerRow;
+				int rowEnd = Math.min(rowStart + buttonsPerRow, buttons.size());
+				int rowCount = rowEnd - rowStart;
+				float rowGapActual = (width - rowCount * TalentButton.WIDTH) / (rowCount + 1);
+				left = x + rowGapActual;
+				for (int i = rowStart; i < rowEnd; i++) {
+					TalentButton btn = buttons.get(i);
+					btn.setPos(left, rowTop);
+					PixelScene.align(btn);
+					left += btn.width() + rowGapActual;
+				}
+				rowTop += TalentButton.HEIGHT + 2;
 			}
 
-			height = buttons.get(0).bottom() - y;
+			height = buttons.get(buttons.size() - 1).bottom() - y;
 
 		}
 

@@ -180,6 +180,7 @@ public class Dungeon {
 	}
 
 	public static int challenges;
+	public static boolean crossClassTalents;
 	public static float mobsToChampion;
 
 	public static Hero hero;
@@ -235,6 +236,7 @@ public class Dungeon {
 
 		initialVersion = version = Game.versionCode;
 		challenges = SPDSettings.challenges();
+		crossClassTalents = SPDSettings.crossClassTalents();
 		mobsToChampion = 1;
 
 		Actor.clear();
@@ -630,6 +632,7 @@ public class Dungeon {
 	private static final String ENDLESS     = "endless";
 	private static final String LAST_PLAYED = "last_played";
 	private static final String CHALLENGES	= "challenges";
+	private static final String CROSS_CLASS_TALENTS = "cross_class_talents";
 	private static final String MOBS_TO_CHAMPION	= "mobs_to_champion";
 	private static final String HERO		= "hero";
 	private static final String DEPTH		= "depth";
@@ -658,6 +661,7 @@ public class Dungeon {
 			bundle.put( ENDLESS, endless );
 			bundle.put( LAST_PLAYED, lastPlayed = Game.realTime);
 			bundle.put( CHALLENGES, challenges );
+			bundle.put( CROSS_CLASS_TALENTS, crossClassTalents );
 			bundle.put( MOBS_TO_CHAMPION, mobsToChampion );
 			bundle.put( HERO, hero );
 			bundle.put( DEPTH, depth );
@@ -766,6 +770,7 @@ public class Dungeon {
 		Toolbar.swappedQuickslots = false;
 
 		Dungeon.challenges = bundle.getInt( CHALLENGES );
+		Dungeon.crossClassTalents = bundle.getBoolean( CROSS_CLASS_TALENTS );
 		Dungeon.mobsToChampion = bundle.getFloat( MOBS_TO_CHAMPION );
 		
 		Dungeon.level = null;
@@ -885,6 +890,7 @@ public class Dungeon {
 		info.depth = bundle.getInt( DEPTH );
 		info.version = bundle.getInt( VERSION );
 		info.challenges = bundle.getInt( CHALLENGES );
+		info.crossClassTalents = bundle.getBoolean( CROSS_CLASS_TALENTS );
 		info.seed = bundle.getLong( SEED );
 		info.customSeed = bundle.getString( CUSTOM_SEED );
 		info.daily = bundle.getBoolean( DAILY );
