@@ -51,6 +51,13 @@ import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndTextInput;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndTitledMessage;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndVictoryCongrats;
+import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfMagicMissile;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Cudgel;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Dagger;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Gloves;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MagesStaff;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Rapier;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.WornShortsword;
 import com.watabou.gltextures.TextureCache;
 import com.watabou.input.PointerEvent;
 import com.watabou.noosa.Camera;
@@ -627,6 +634,7 @@ public class HeroSelectScene extends PixelScene {
 		private ArrayList<ColorBlock> spacers;
 
 		protected StyledButton challengeButton;
+		protected StyledButton startWeaponButton;
 
 		@Override
 		protected void createChildren() {
@@ -821,6 +829,32 @@ public class HeroSelectScene extends PixelScene {
 			add(challengeButton);
 			buttons.add(challengeButton);
 
+			startWeaponButton = new StyledButton(Chrome.Type.BLANK, "", 6){
+				@Override
+				protected void onClick() {
+					final String[] options = new String[HeroClass.StartingWeapon.values().length];
+					for (int i = 0; i < options.length; i++){
+						options[i] = startWeaponOptionName(HeroClass.StartingWeapon.values()[i]);
+					}
+					ShatteredPixelDungeon.scene().addToFront(new WndOptions(
+							Messages.get(HeroSelectScene.class, "start_weapon_title"),
+							Messages.get(HeroSelectScene.class, "start_weapon_desc"),
+							options) {
+						@Override
+						protected void onSelect(int index) {
+							SPDSettings.startWeapon(index);
+							updateStartWeaponButton();
+							GameOptions.this.layout();
+						}
+					});
+				}
+			};
+			startWeaponButton.leftJustify = true;
+			startWeaponButton.icon(Icons.get(Icons.ENTER));
+			updateStartWeaponButton();
+			add(startWeaponButton);
+			buttons.add(startWeaponButton);
+
 			int unlockedCount = 0;
 			for (HeroClass cls : HeroClass.values()){
 				if (cls.isUnlocked()) unlockedCount++;
@@ -854,6 +888,33 @@ public class HeroSelectScene extends PixelScene {
 				ColorBlock spc = new ColorBlock(1, 1, 0xFF000000);
 				add(spc);
 				spacers.add(spc);
+			}
+		}
+
+		private void updateStartWeaponButton(){
+			startWeaponButton.text(Messages.get(HeroSelectScene.class, "start_weapon") + ": "
+					+ startWeaponOptionName(HeroClass.StartingWeapon.get(SPDSettings.startWeapon())));
+		}
+
+		private String startWeaponOptionName(HeroClass.StartingWeapon option){
+			switch (option){
+				case CLASS_DEFAULT:
+					return Messages.get(HeroSelectScene.class, "start_weapon_default");
+				case RANDOM:
+					return Messages.get(HeroSelectScene.class, "start_weapon_random");
+				case WORN_SHORTSWORD:
+					return Messages.titleCase(new WornShortsword().name());
+				case MAGES_STAFF:
+					return Messages.titleCase(new MagesStaff(new WandOfMagicMissile()).name());
+				case DAGGER:
+					return Messages.titleCase(new Dagger().name());
+				case GLOVES:
+					return Messages.titleCase(new Gloves().name());
+				case RAPIER:
+					return Messages.titleCase(new Rapier().name());
+				case CUDGEL:
+				default:
+					return Messages.titleCase(new Cudgel().name());
 			}
 		}
 

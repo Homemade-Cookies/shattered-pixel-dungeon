@@ -73,6 +73,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Cudgel;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Dagger;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Gloves;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MagesStaff;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Rapier;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.WornShortsword;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ThrowingKnife;
@@ -81,6 +82,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ThrowingSt
 import com.shatteredpixel.shatteredpixeldungeon.journal.Catalog;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.watabou.utils.DeviceCompat;
+import com.watabou.utils.Random;
 
 public enum HeroClass {
 
@@ -95,6 +97,25 @@ public enum HeroClass {
 
 	HeroClass( HeroSubClass...subClasses ) {
 		this.subClasses = subClasses;
+	}
+
+	public enum StartingWeapon {
+		CLASS_DEFAULT,
+		RANDOM,
+		WORN_SHORTSWORD,
+		MAGES_STAFF,
+		DAGGER,
+		GLOVES,
+		RAPIER,
+		CUDGEL;
+
+		public static StartingWeapon get( int index ){
+			StartingWeapon[] values = values();
+			if (index < 0 || index >= values.length){
+				return CLASS_DEFAULT;
+			}
+			return values[index];
+		}
 	}
 
 	public void initHero( Hero hero ) {
@@ -172,7 +193,7 @@ public enum HeroClass {
 	}
 
 	private static void initWarrior( Hero hero ) {
-		(hero.belongings.weapon = new WornShortsword()).identify();
+		applyStartingWeapon(hero, new WornShortsword());
 		ThrowingStone stones = new ThrowingStone();
 		stones.identify().collect();
 
@@ -188,21 +209,17 @@ public enum HeroClass {
 	}
 
 	private static void initMage( Hero hero ) {
-		MagesStaff staff;
-
-		staff = new MagesStaff(new WandOfMagicMissile());
-
-		(hero.belongings.weapon = staff).identify();
+		applyStartingWeapon(hero, new MagesStaff(new WandOfMagicMissile()));
 		hero.belongings.weapon.activate(hero);
 
-		Dungeon.quickslot.setSlot(0, staff);
+		Dungeon.quickslot.setSlot(0, hero.belongings.weapon);
 
 		new ScrollOfUpgrade().identify();
 		new PotionOfLiquidFlame().identify();
 	}
 
 	private static void initRogue( Hero hero ) {
-		(hero.belongings.weapon = new Dagger()).identify();
+		applyStartingWeapon(hero, new Dagger());
 
 		CloakOfShadows cloak = new CloakOfShadows();
 		(hero.belongings.artifact = cloak).identify();
@@ -220,7 +237,7 @@ public enum HeroClass {
 
 	private static void initHuntress( Hero hero ) {
 
-		(hero.belongings.weapon = new Gloves()).identify();
+		applyStartingWeapon(hero, new Gloves());
 		SpiritBow bow = new SpiritBow();
 		bow.identify().collect();
 
@@ -232,7 +249,7 @@ public enum HeroClass {
 
 	private static void initDuelist( Hero hero ) {
 
-		(hero.belongings.weapon = new Rapier()).identify();
+		applyStartingWeapon(hero, new Rapier());
 		hero.belongings.weapon.activate(hero);
 
 		ThrowingSpike spikes = new ThrowingSpike();
@@ -247,7 +264,7 @@ public enum HeroClass {
 
 	private static void initCleric( Hero hero ) {
 
-		(hero.belongings.weapon = new Cudgel()).identify();
+		applyStartingWeapon(hero, new Cudgel());
 		hero.belongings.weapon.activate(hero);
 
 		HolyTome tome = new HolyTome();
@@ -262,6 +279,58 @@ public enum HeroClass {
 
 	public String title() {
 		return Messages.get(HeroClass.class, name());
+	}
+
+	private static void applyStartingWeapon( Hero hero, MeleeWeapon classDefaultWeapon ){
+		StartingWeapon selection = StartingWeapon.get(SPDSettings.startWeapon());
+		MeleeWeapon selectedWeapon = classDefaultWeapon;
+		switch (selection){
+			case RANDOM:
+				selectedWeapon = randomStartingWeapon();
+				break;
+			case WORN_SHORTSWORD:
+			case MAGES_STAFF:
+			case DAGGER:
+			case GLOVES:
+			case RAPIER:
+			case CUDGEL:
+				selectedWeapon = selectedStartingWeapon(selection);
+				break;
+			case CLASS_DEFAULT:
+			default:
+				break;
+		}
+		(hero.belongings.weapon = selectedWeapon).identify();
+	}
+
+	private static MeleeWeapon randomStartingWeapon(){
+		StartingWeapon randomSelection = Random.oneOf(
+				StartingWeapon.WORN_SHORTSWORD,
+				StartingWeapon.MAGES_STAFF,
+				StartingWeapon.DAGGER,
+				StartingWeapon.GLOVES,
+				StartingWeapon.RAPIER,
+				StartingWeapon.CUDGEL
+		);
+		return selectedStartingWeapon(randomSelection);
+	}
+
+	private static MeleeWeapon selectedStartingWeapon( StartingWeapon selection ){
+		switch (selection){
+			case WORN_SHORTSWORD:
+				return new WornShortsword();
+			case MAGES_STAFF:
+				return new MagesStaff(new WandOfMagicMissile());
+			case DAGGER:
+				return new Dagger();
+			case GLOVES:
+				return new Gloves();
+			case RAPIER:
+				return new Rapier();
+			case CUDGEL:
+			default:
+				return new Cudgel();
+		}
 	}
 
 	public String desc(){
