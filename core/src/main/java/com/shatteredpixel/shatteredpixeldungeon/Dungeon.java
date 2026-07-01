@@ -180,13 +180,17 @@ public class Dungeon {
 	}
 
 	public static int challenges;
+	public static boolean crossClassTalents;
 	public static float mobsToChampion;
 
 	public static Hero hero;
 	public static Level level;
 
 	public static QuickSlot quickslot = new QuickSlot();
-	
+
+	public static Difficulty difficulty = Difficulty.NORMAL;
+	public static boolean hungerEnabled = true;
+
 	public static int depth;
 	//determines path the hero is on. Current uses:
 	// 0 is the default path
@@ -209,6 +213,7 @@ public class Dungeon {
 
 	public static boolean daily;
 	public static boolean dailyReplay;
+	public static boolean endless;
 	public static String customSeedText = "";
 	public static long seed;
 	public static long lastPlayed;
@@ -234,6 +239,7 @@ public class Dungeon {
 
 		initialVersion = version = Game.versionCode;
 		challenges = SPDSettings.challenges();
+		crossClassTalents = SPDSettings.crossClassTalents();
 		mobsToChampion = 1;
 
 		Actor.clear();
@@ -294,13 +300,28 @@ public class Dungeon {
 		return generatedLevels.contains(depth + 1000*branch);
 	}
 	
+	private static Level randomBiomeLevel() {
+		switch (Random.Int(5)) {
+			case 0:  return new SewerLevel();
+			case 1:  return new PrisonLevel();
+			case 2:  return new CavesLevel();
+			case 3:  return new CityLevel();
+			default: return new HallsLevel();
+		}
+	}
+
 	public static Level newLevel() {
 		
 		Dungeon.level = null;
 		Actor.clear();
 		
 		Level level;
-		if (branch == 0) {
+		if (branch == 0 && endless) {
+			// Endless mode: randomly select a regular level type each floor.
+			// Boss-depth floors (depth % 5 == 0) get a random artifact chest instead of a boss encounter.
+			// Shops appear at depth % 5 == 1, starting from depth 6 (depths 6, 11, 16, ...).
+			level = randomBiomeLevel();
+		} else if (branch == 0) {
 			switch (depth) {
 				case 1:
 				case 2:
@@ -431,6 +452,10 @@ public class Dungeon {
 	}
 	
 	public static boolean shopOnLevel() {
+		if (endless) {
+			// Shop appears at depths 6, 11, 16, ... (depth % 5 == 1 and depth > 1)
+			return depth % 5 == 1 && depth > 1;
+		}
 		return depth == 6 || depth == 11 || depth == 16;
 	}
 	
@@ -439,6 +464,9 @@ public class Dungeon {
 	}
 	
 	public static boolean bossLevel( int depth ) {
+		if (endless) {
+			return depth % 5 == 0 && depth > 0;
+		}
 		return depth == 5 || depth == 10 || depth == 15 || depth == 20 || depth == 25;
 	}
 
@@ -604,8 +632,12 @@ public class Dungeon {
 	private static final String CUSTOM_SEED	= "custom_seed";
 	private static final String DAILY	    = "daily";
 	private static final String DAILY_REPLAY= "daily_replay";
+	private static final String ENDLESS     = "endless";
 	private static final String LAST_PLAYED = "last_played";
+	private static final String DIFFICULTY  = "difficulty";
+	private static final String HUNGER_ENABLED = "hunger_enabled";
 	private static final String CHALLENGES	= "challenges";
+	private static final String CROSS_CLASS_TALENTS = "cross_class_talents";
 	private static final String MOBS_TO_CHAMPION	= "mobs_to_champion";
 	private static final String HERO		= "hero";
 	private static final String DEPTH		= "depth";
@@ -631,9 +663,13 @@ public class Dungeon {
 			bundle.put( CUSTOM_SEED, customSeedText );
 			bundle.put( DAILY, daily );
 			bundle.put( DAILY_REPLAY, dailyReplay );
+			bundle.put( ENDLESS, endless );
 			bundle.put( LAST_PLAYED, lastPlayed = Game.realTime);
 			bundle.put( CHALLENGES, challenges );
+			bundle.put( CROSS_CLASS_TALENTS, crossClassTalents );
 			bundle.put( MOBS_TO_CHAMPION, mobsToChampion );
+			bundle.put( DIFFICULTY, difficulty.name() );
+			bundle.put( HUNGER_ENABLED, hungerEnabled );
 			bundle.put( HERO, hero );
 			bundle.put( DEPTH, depth );
 			bundle.put( BRANCH, branch );
@@ -731,6 +767,7 @@ public class Dungeon {
 		customSeedText = bundle.getString( CUSTOM_SEED );
 		daily = bundle.getBoolean( DAILY );
 		dailyReplay = bundle.getBoolean( DAILY_REPLAY );
+		endless = bundle.getBoolean( ENDLESS );
 
 		Actor.clear();
 		Actor.restoreNextID( bundle );
@@ -740,8 +777,25 @@ public class Dungeon {
 		Toolbar.swappedQuickslots = false;
 
 		Dungeon.challenges = bundle.getInt( CHALLENGES );
+		Dungeon.crossClassTalents = bundle.getBoolean( CROSS_CLASS_TALENTS );
 		Dungeon.mobsToChampion = bundle.getFloat( MOBS_TO_CHAMPION );
-		
+
+		if (bundle.contains( DIFFICULTY )) {
+			try {
+				difficulty = Difficulty.valueOf(bundle.getString( DIFFICULTY ));
+			} catch (IllegalArgumentException e) {
+				difficulty = Difficulty.NORMAL;
+			}
+		} else {
+			difficulty = Difficulty.NORMAL;
+		}
+
+		if (bundle.contains( HUNGER_ENABLED )) {
+			hungerEnabled = bundle.getBoolean( HUNGER_ENABLED );
+		} else {
+			hungerEnabled = difficulty.hungerEnabled;
+		}
+
 		Dungeon.level = null;
 		Dungeon.depth = -1;
 		
@@ -859,10 +913,12 @@ public class Dungeon {
 		info.depth = bundle.getInt( DEPTH );
 		info.version = bundle.getInt( VERSION );
 		info.challenges = bundle.getInt( CHALLENGES );
+		info.crossClassTalents = bundle.getBoolean( CROSS_CLASS_TALENTS );
 		info.seed = bundle.getLong( SEED );
 		info.customSeed = bundle.getString( CUSTOM_SEED );
 		info.daily = bundle.getBoolean( DAILY );
 		info.dailyReplay = bundle.getBoolean( DAILY_REPLAY );
+		info.endless = bundle.getBoolean( ENDLESS );
 		info.lastPlayed = bundle.getLong( LAST_PLAYED );
 
 		Hero.preview( info, bundle.getBundle( HERO ) );

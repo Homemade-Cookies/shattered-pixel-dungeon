@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.scenes;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Chrome;
+import com.shatteredpixel.shatteredpixeldungeon.Difficulty;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
 import com.shatteredpixel.shatteredpixeldungeon.Rankings;
@@ -44,6 +45,7 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.StyledButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
 import com.shatteredpixel.shatteredpixeldungeon.utils.DungeonSeed;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndChallenges;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndDifficulty;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndHeroInfo;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndKeyBindings;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndMessage;
@@ -96,6 +98,7 @@ public class HeroSelectScene extends PixelScene {
 	private StyledButton startBtn;
 	private IconButton infoButton;
 	private IconButton btnOptions;
+	private StyledButton btnDifficulty;
 	private GameOptions optionsPane;
 	private IconButton btnExit;
 
@@ -163,6 +166,7 @@ public class HeroSelectScene extends PixelScene {
 
 				Dungeon.hero = null;
 				Dungeon.daily = Dungeon.dailyReplay = false;
+				Dungeon.endless = false;
 				Dungeon.initSeed();
 				ActionIndicator.clearAction();
 				InterlevelScene.mode = InterlevelScene.Mode.DESCEND;
@@ -239,6 +243,18 @@ public class HeroSelectScene extends PixelScene {
 		if(!SPDSettings.intro()){
 			add(btnOptions);
 		}
+
+		btnDifficulty = new StyledButton(Chrome.Type.GREY_BUTTON_TR, "Difficulty") {
+			@Override
+			protected void onClick() {
+				super.onClick();
+				ShatteredPixelDungeon.scene().add(new WndDifficulty());
+			}
+		};
+		btnDifficulty.textColor(Window.TITLE_COLOR);
+		add(btnDifficulty);
+		btnDifficulty.visible = true;
+		btnDifficulty.active = true;
 
 		if (!Badges.isUnlocked(Badges.Badge.VICTORY) && !DeviceCompat.isDebug()){
 			Dungeon.challenges = 0;
@@ -329,6 +345,8 @@ public class HeroSelectScene extends PixelScene {
 			btnOptions.setRect(startBtn.right(), startBtn.top(), 20, 21);
 			optionsPane.setPos(btnOptions.right(), btnOptions.top() - optionsPane.height() - 2);
 			align(optionsPane);
+
+			btnDifficulty.setRect(insets.left + 10, insets.top + 5, 100, 21);
 		} else {
 			background.visible = false;
 
@@ -360,6 +378,8 @@ public class HeroSelectScene extends PixelScene {
 
 			btnOptions.setRect(heroBtns.get(0).left() + 16, Camera.main.height-HeroBtn.HEIGHT-16, 20, 21);
 			optionsPane.setPos(heroBtns.get(0).left(), 0);
+
+			btnDifficulty.setRect(insets.left + 4, Camera.main.height - insets.bottom - 45, 100, 21);
 		}
 
 		btnExit = new ExitButton();
@@ -437,6 +457,9 @@ public class HeroSelectScene extends PixelScene {
 
 		if (landscape()) {
 
+			btnDifficulty.visible = btnDifficulty.active = true;
+			btnDifficulty.setRect(insets.left + 10, insets.top + 10, 100, 21);
+
 			heroName.text(Messages.titleCase(cl.title()));
 			heroName.hardlight(Window.TITLE_COLOR);
 			heroName.setPos(insets.left + (leftPortion - heroName.width() - 20)/2f, heroName.top());
@@ -463,6 +486,8 @@ public class HeroSelectScene extends PixelScene {
 
 			btnOptions.visible = btnOptions.active = !SPDSettings.intro();
 
+			btnDifficulty.visible = btnDifficulty.active = true;
+
 		} else {
 			title.visible = false;
 
@@ -481,6 +506,10 @@ public class HeroSelectScene extends PixelScene {
 
 			optionsPane.setPos(heroBtns.get(0).left(), startBtn.top() - optionsPane.height() - 2);
 			align(optionsPane);
+
+			btnDifficulty.visible = btnDifficulty.active = true;
+			float availableWidth = (Camera.main.width - insets.left - insets.right);
+			btnDifficulty.setRect(insets.left + (availableWidth - 100) / 2f, insets.top + 50, 100, 21);
 		}
 
 		updateOptionsColor();
@@ -495,6 +524,7 @@ public class HeroSelectScene extends PixelScene {
 			SPDSettings.intro(false);
 		}
 		btnExit.visible = btnExit.active = !SPDSettings.intro();
+		btnDifficulty.text("Difficulty: " + Dungeon.difficulty.label());
 		//do not fade when a window is open
 		for (Object v : members){
 			if (v instanceof Window) resetFade();
@@ -530,6 +560,8 @@ public class HeroSelectScene extends PixelScene {
 		btnOptions.icon().alpha(alpha);
 		infoButton.enable(alpha != 0);
 		infoButton.icon().alpha(alpha);
+		btnDifficulty.enable(alpha != 0);
+		btnDifficulty.alpha(alpha);
 
 		if (landscape()){
 
@@ -759,6 +791,7 @@ public class HeroSelectScene extends PixelScene {
 
 								Dungeon.hero = null;
 								Dungeon.daily = true;
+								Dungeon.endless = false;
 								Dungeon.initSeed();
 								ActionIndicator.clearAction();
 								InterlevelScene.mode = InterlevelScene.Mode.DESCEND;
@@ -803,6 +836,45 @@ public class HeroSelectScene extends PixelScene {
 			add(dailyButton);
 			buttons.add(dailyButton);
 
+			StyledButton endlessButton = new StyledButton(Chrome.Type.BLANK, Messages.get(HeroSelectScene.class, "endless"), 6){
+				@Override
+				protected void onClick() {
+					super.onClick();
+
+					for (GamesInProgress.Info game : GamesInProgress.checkAll()){
+						if (game.endless){
+							ShatteredPixelDungeon.scene().addToFront(new WndMessage(Messages.get(HeroSelectScene.class, "endless_existing")));
+							return;
+						}
+					}
+
+					ShatteredPixelDungeon.scene().addToFront(new WndOptions(
+							Icons.get(Icons.SKULL),
+							Messages.get(HeroSelectScene.class, "endless"),
+							Messages.get(HeroSelectScene.class, "endless_desc"),
+							Messages.get(HeroSelectScene.class, "endless_yes"),
+							Messages.get(HeroSelectScene.class, "endless_no")){
+						@Override
+						protected void onSelect(int index) {
+							if (index == 0){
+								Dungeon.hero = null;
+								Dungeon.daily = Dungeon.dailyReplay = false;
+								Dungeon.endless = true;
+								Dungeon.initSeed();
+								ActionIndicator.clearAction();
+								InterlevelScene.mode = InterlevelScene.Mode.DESCEND;
+
+								Game.switchScene( InterlevelScene.class );
+							}
+						}
+					});
+				}
+			};
+			endlessButton.leftJustify = true;
+			endlessButton.icon(Icons.get(Icons.SKULL));
+			add(endlessButton);
+			buttons.add(endlessButton);
+
 			challengeButton = new StyledButton(Chrome.Type.BLANK, Messages.get(WndChallenges.class, "title"), 6){
 				@Override
 				protected void onClick() {
@@ -815,7 +887,7 @@ public class HeroSelectScene extends PixelScene {
 						return;
 					}
 
-					ShatteredPixelDungeon.scene().addToFront(new WndChallenges(SPDSettings.challenges(), true) {
+					ShatteredPixelDungeon.scene().addToFront(new WndChallenges(SPDSettings.challenges(), true, SPDSettings.crossClassTalents()) {
 						public void onBackPressed() {
 							super.onBackPressed();
 							icon(Icons.get(SPDSettings.challenges() > 0 ? Icons.CHALLENGE_COLOR : Icons.CHALLENGE_GREY));
@@ -992,7 +1064,7 @@ public class HeroSelectScene extends PixelScene {
 							}
 							SPDSettings.challenges(mask);
 							challengeButton.icon(Icons.get(SPDSettings.challenges() > 0 ? Icons.CHALLENGE_COLOR : Icons.CHALLENGE_GREY));
-							ShatteredPixelDungeon.scene().addToFront(new WndChallenges(mask, false));
+							ShatteredPixelDungeon.scene().addToFront(new WndChallenges(mask, false, SPDSettings.crossClassTalents()));
 						}
 
 						if (chkHero.checked()){

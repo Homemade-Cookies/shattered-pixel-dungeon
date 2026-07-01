@@ -243,6 +243,7 @@ public enum Rankings {
 	public static final String CUSTOM_SEED	= "custom_seed";
 	public static final String DAILY	    = "daily";
 	public static final String DAILY_REPLAY	= "daily_replay";
+	public static final String ENDLESS      = "endless";
 
 	public void saveGameData(Record rec){
 		if (Dungeon.hero == null){
@@ -313,6 +314,7 @@ public enum Rankings {
 		rec.gameData.put( CUSTOM_SEED, Dungeon.customSeedText );
 		rec.gameData.put( DAILY, Dungeon.daily );
 		rec.gameData.put( DAILY_REPLAY, Dungeon.dailyReplay );
+		rec.gameData.put( ENDLESS, Dungeon.endless );
 	}
 
 	public void loadGameData(Record rec){
@@ -355,10 +357,12 @@ public enum Rankings {
 			Dungeon.customSeedText = rec.gameData.getString(CUSTOM_SEED);
 			Dungeon.daily = rec.gameData.getBoolean(DAILY);
 			Dungeon.dailyReplay = rec.gameData.getBoolean(DAILY_REPLAY);
+			Dungeon.endless = rec.gameData.getBoolean(ENDLESS);
 		} else {
 			Dungeon.seed = -1;
 			Dungeon.customSeedText = "";
 			Dungeon.daily = Dungeon.dailyReplay = false;
+			Dungeon.endless = false;
 		}
 	}
 	

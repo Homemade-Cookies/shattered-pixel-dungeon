@@ -375,7 +375,24 @@ public abstract class RegularLevel extends Level {
 	
 	@Override
 	protected void createItems() {
-		
+
+		// In endless mode, boss-depth floors (depth % 5 == 0) get a locked chest
+		// containing a random artifact instead of a boss encounter.
+		if (Dungeon.endless && Dungeon.bossLevel()) {
+			Artifact bossReward = Generator.randomArtifact();
+			if (bossReward != null) {
+				int cell = randomDropCell();
+				if (map[cell] == Terrain.HIGH_GRASS || map[cell] == Terrain.FURROWED_GRASS) {
+					map[cell] = Terrain.GRASS;
+					losBlocking[cell] = false;
+				}
+				Heap chest = drop(bossReward, cell);
+				chest.type = Heap.Type.LOCKED_CHEST;
+				chest.endlessBossReward = true;
+				addItemToSpawn(new GoldenKey(Dungeon.depth));
+			}
+		}
+
 		// drops 3/4/5 items 60%/30%/10% of the time
 		int nItems = 3 + Random.chances(new float[]{6, 3, 1});
 

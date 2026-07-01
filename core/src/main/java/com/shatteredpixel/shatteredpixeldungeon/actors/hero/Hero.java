@@ -448,7 +448,9 @@ public class Hero extends Char {
 			if (!b.revivePersists) b.detach();
 		}
 		Buff.affect( this, Regeneration.class );
-		Buff.affect( this, Hunger.class );
+		if (Dungeon.hungerEnabled) {
+			Buff.affect( this, Hunger.class );
+		}
 	}
 	
 	public int tier() {

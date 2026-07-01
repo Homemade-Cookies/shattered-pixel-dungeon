@@ -32,6 +32,7 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.ElmoParticle;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.ShadowParticle;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.Artifact;
+import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
 import com.shatteredpixel.shatteredpixeldungeon.items.bombs.Bomb;
 import com.shatteredpixel.shatteredpixeldungeon.items.food.ChargrilledMeat;
 import com.shatteredpixel.shatteredpixeldungeon.items.food.FrozenCarpaccio;
@@ -78,6 +79,7 @@ public class Heap implements Bundlable {
 	public boolean haunted = false;
 	public boolean autoExplored = false; //used to determine if this heap should count for exploration bonus
 	public boolean hidden = false; //sets alpha to 15%
+	public boolean endlessBossReward = false; //marks a chest as an endless-mode boss-depth artifact reward
 	
 	public LinkedList<Item> items = new LinkedList<>();
 	
@@ -111,6 +113,25 @@ public class Heap implements Bundlable {
 			items.addAll(0, bonus);
 			RingOfWealth.showFlareForBonusDrop(sprite);
 		}
+
+		// Endless boss-depth reward: auto-reroll if the hero already owns this artifact
+		if (endlessBossReward) {
+			for (int i = 0; i < items.size(); i++) {
+				Item item = items.get(i);
+				if (item instanceof Artifact) {
+					Artifact artifact = (Artifact) item;
+					while (hero.belongings.getItem(artifact.getClass()) != null) {
+						Artifact rerolled = Generator.randomArtifact();
+						if (rerolled == null) break; // pool exhausted
+						GLog.p(Messages.get(Heap.class, "endless_boss_reroll", artifact.name(), rerolled.name()));
+						items.set(i, rerolled);
+						artifact = rerolled;
+					}
+					break; // only one artifact per boss chest
+				}
+			}
+		}
+
 		sprite.link();
 		sprite.drop();
 	}
@@ -422,6 +443,7 @@ public class Heap implements Bundlable {
 	private static final String HAUNTED	= "haunted";
 	private static final String AUTO_EXPLORED	= "auto_explored";
 	private static final String HIDDEN	= "hidden";
+	private static final String ENDLESS_BOSS_REWARD = "endless_boss_reward";
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -448,6 +470,7 @@ public class Heap implements Bundlable {
 		haunted = bundle.getBoolean( HAUNTED );
 		autoExplored = bundle.getBoolean( AUTO_EXPLORED );
 		hidden = bundle.getBoolean( HIDDEN );
+		endlessBossReward = bundle.getBoolean( ENDLESS_BOSS_REWARD );
 	}
 
 	@Override
@@ -459,6 +482,7 @@ public class Heap implements Bundlable {
 		bundle.put( HAUNTED, haunted );
 		bundle.put( AUTO_EXPLORED, autoExplored );
 		bundle.put( HIDDEN, hidden );
+		bundle.put( ENDLESS_BOSS_REWARD, endlessBossReward );
 	}
 	
 }

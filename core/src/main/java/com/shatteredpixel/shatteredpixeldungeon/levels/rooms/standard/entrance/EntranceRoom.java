@@ -182,7 +182,8 @@ public class EntranceRoom extends StandardRoom {
 	}
 
 	public static StandardRoom createEntrance(){
-		return Reflection.newInstance(rooms.get(Random.chances(chances[Dungeon.depth])));
+		int d = Math.min(Dungeon.depth, chances.length - 1);
+		return Reflection.newInstance(rooms.get(Random.chances(chances[d])));
 	}
 
 }

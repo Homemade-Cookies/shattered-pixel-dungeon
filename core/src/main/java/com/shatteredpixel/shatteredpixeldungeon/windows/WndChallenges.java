@@ -43,8 +43,9 @@ public class WndChallenges extends Window {
 
 	private boolean editable;
 	private ArrayList<CheckBox> boxes;
+	private CheckBox crossClassBox;
 
-	public WndChallenges( int checked, boolean editable ) {
+	public WndChallenges( int checked, boolean editable, boolean crossClassEnabled ) {
 
 		super();
 
@@ -93,6 +94,29 @@ public class WndChallenges extends Window {
 			pos = cb.bottom();
 		}
 
+		// cross-class talents toggle
+		pos += GAP;
+
+		crossClassBox = new CheckBox( Messages.titleCase(Messages.get(this, "cross_class_talents")) );
+		crossClassBox.checked( crossClassEnabled );
+		crossClassBox.active = editable;
+		crossClassBox.setRect( 0, pos, WIDTH-16, BTN_HEIGHT );
+		add( crossClassBox );
+
+		final IconButton crossClassInfo = new IconButton(Icons.get(Icons.INFO)){
+			@Override
+			protected void onClick() {
+				super.onClick();
+				ShatteredPixelDungeon.scene().add(
+						new WndMessage(Messages.get(WndChallenges.class, "cross_class_talents_desc"))
+				);
+			}
+		};
+		crossClassInfo.setRect(crossClassBox.right(), pos, 16, BTN_HEIGHT);
+		add(crossClassInfo);
+
+		pos = crossClassBox.bottom();
+
 		resize( WIDTH, (int)pos );
 	}
 
@@ -107,6 +131,7 @@ public class WndChallenges extends Window {
 				}
 			}
 			SPDSettings.challenges( value );
+			SPDSettings.crossClassTalents( crossClassBox.checked() );
 		}
 
 		super.onBackPressed();

@@ -56,6 +56,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.spells.DivineSense;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.spells.Stasis;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.GnollGeomancer;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mimic;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.MobDifficultyScaling;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.MobSpawner;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Piranha;
@@ -511,6 +512,7 @@ public abstract class Level implements Bundlable {
 		}
 
 		Mob m = Reflection.newInstance(mobsToSpawn.remove(0));
+		MobDifficultyScaling.scaleMob(m);
 		ChampionEnemy.rollForChampion(m);
 		return m;
 	}
@@ -565,6 +567,15 @@ public abstract class Level implements Bundlable {
 	//returns true if we immediately transition, false otherwise
 	public boolean activateTransition(Hero hero, LevelTransition transition){
 		if (locked){
+			return false;
+		}
+
+		// In endless mode, block going back to previous levels or the surface
+		if (Dungeon.endless &&
+				(transition.type == LevelTransition.Type.SURFACE
+						|| transition.type == LevelTransition.Type.REGULAR_ENTRANCE
+						|| transition.type == LevelTransition.Type.BRANCH_ENTRANCE)) {
+			GLog.w(Messages.get(Level.class, "endless_no_return"));
 			return false;
 		}
 

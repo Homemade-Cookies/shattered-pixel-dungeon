@@ -143,11 +143,13 @@ public class GamesInProgress {
 		
 		info.depth = Dungeon.depth;
 		info.challenges = Dungeon.challenges;
+		info.crossClassTalents = Dungeon.crossClassTalents;
 
 		info.seed = Dungeon.seed;
 		info.customSeed = Dungeon.customSeedText;
 		info.daily = Dungeon.daily;
 		info.dailyReplay = Dungeon.dailyReplay;
+		info.endless = Dungeon.endless;
 		
 		info.level = Dungeon.hero.lvl;
 		info.str = Dungeon.hero.STR;
@@ -180,11 +182,13 @@ public class GamesInProgress {
 		public int depth;
 		public int version;
 		public int challenges;
+		public boolean crossClassTalents;
 
 		public long seed;
 		public String customSeed;
 		public boolean daily;
 		public boolean dailyReplay;
+		public boolean endless;
 		public long lastPlayed;
 
 		public int level;
