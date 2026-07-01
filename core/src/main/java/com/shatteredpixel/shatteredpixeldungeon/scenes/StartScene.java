@@ -23,6 +23,8 @@ package com.shatteredpixel.shatteredpixeldungeon.scenes;
 
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Chrome;
+import com.shatteredpixel.shatteredpixeldungeon.Difficulty;
+import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
 import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
@@ -37,6 +39,7 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.RenderedTextBlock;
 import com.shatteredpixel.shatteredpixeldungeon.ui.StyledButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
 import com.shatteredpixel.shatteredpixeldungeon.windows.IconTitle;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndDifficulty;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndGameInProgress;
 import com.watabou.noosa.BitmapText;
 import com.watabou.noosa.Camera;
@@ -51,7 +54,9 @@ public class StartScene extends PixelScene {
 	
 	private static final int SLOT_WIDTH = 120;
 	private static final int SLOT_HEIGHT = 22;
-	
+
+	private StyledButton diffButton;
+
 	@Override
 	public void create() {
 		super.create();
@@ -154,8 +159,27 @@ public class StartScene extends PixelScene {
 		}
 		if (games.size() >= 2) add(btnSort);
 
+		diffButton = new StyledButton(Chrome.Type.TOAST_TR, "Difficulty") {
+			@Override
+			protected void onClick() {
+				super.onClick();
+				ShatteredPixelDungeon.scene().add(new WndDifficulty());
+			}
+		};
+		diffButton.textColor(0xCCCCCC);
+		diffButton.setRect(slotLeft, Camera.main.height - 30, SLOT_WIDTH + 4, 12);
+		add(diffButton);
+
 		fadeIn();
-		
+
+	}
+
+	@Override
+	public void update() {
+		super.update();
+		if (diffButton != null) {
+			diffButton.text("Difficulty: " + Dungeon.difficulty.label());
+		}
 	}
 
 	@Override

@@ -187,7 +187,10 @@ public class Dungeon {
 	public static Level level;
 
 	public static QuickSlot quickslot = new QuickSlot();
-	
+
+	public static Difficulty difficulty = Difficulty.NORMAL;
+	public static boolean hungerEnabled = true;
+
 	public static int depth;
 	//determines path the hero is on. Current uses:
 	// 0 is the default path
@@ -631,6 +634,8 @@ public class Dungeon {
 	private static final String DAILY_REPLAY= "daily_replay";
 	private static final String ENDLESS     = "endless";
 	private static final String LAST_PLAYED = "last_played";
+	private static final String DIFFICULTY  = "difficulty";
+	private static final String HUNGER_ENABLED = "hunger_enabled";
 	private static final String CHALLENGES	= "challenges";
 	private static final String CROSS_CLASS_TALENTS = "cross_class_talents";
 	private static final String MOBS_TO_CHAMPION	= "mobs_to_champion";
@@ -663,6 +668,8 @@ public class Dungeon {
 			bundle.put( CHALLENGES, challenges );
 			bundle.put( CROSS_CLASS_TALENTS, crossClassTalents );
 			bundle.put( MOBS_TO_CHAMPION, mobsToChampion );
+			bundle.put( DIFFICULTY, difficulty.name() );
+			bundle.put( HUNGER_ENABLED, hungerEnabled );
 			bundle.put( HERO, hero );
 			bundle.put( DEPTH, depth );
 			bundle.put( BRANCH, branch );
@@ -772,7 +779,23 @@ public class Dungeon {
 		Dungeon.challenges = bundle.getInt( CHALLENGES );
 		Dungeon.crossClassTalents = bundle.getBoolean( CROSS_CLASS_TALENTS );
 		Dungeon.mobsToChampion = bundle.getFloat( MOBS_TO_CHAMPION );
-		
+
+		if (bundle.contains( DIFFICULTY )) {
+			try {
+				difficulty = Difficulty.valueOf(bundle.getString( DIFFICULTY ));
+			} catch (IllegalArgumentException e) {
+				difficulty = Difficulty.NORMAL;
+			}
+		} else {
+			difficulty = Difficulty.NORMAL;
+		}
+
+		if (bundle.contains( HUNGER_ENABLED )) {
+			hungerEnabled = bundle.getBoolean( HUNGER_ENABLED );
+		} else {
+			hungerEnabled = difficulty.hungerEnabled;
+		}
+
 		Dungeon.level = null;
 		Dungeon.depth = -1;
 		
